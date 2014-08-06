@@ -1,0 +1,30 @@
+{
+  "name": "olhoaberto",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "dependencies": {
+    "request": "latest",
+    "underscore": "~1.6.0",
+    "mongoose": "~3.8.14",
+    "async": "~0.9.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/transporteaberto/olhoaberto.git"
+  },
+  "keywords": [
+    "openstreetmap",
+    "sptrans",
+    "sãopaulo"
+  ],
+  "author": "",
+  "license": "PD",
+  "bugs": {
+    "url": "https://github.com/transporteaberto/olhoaberto/issues"
+  },
+  "homepage": "https://github.com/transporteaberto/olhoaberto"
+}
