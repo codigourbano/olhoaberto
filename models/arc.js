@@ -10,7 +10,8 @@ var mongoose = require('mongoose'),
  */
 
 var ArcSchema = new Schema({
-	way: { type: Schema.ObjectId, ref: 'Way'},
+	_id: String,
+	way: { type: String, ref: 'Way'},
 	foward: {type: Boolean, default: true} 
 })
 

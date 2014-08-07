@@ -80,38 +80,40 @@ _.each(elements, function(e){
 // console.log(ways.length);
 
 function importWays(doneImportWays) {
-	Way.remove(function(err){
-		if (err) return doneImportWays();
+	async.each(_.keys(osm.ways), function(way_id, doneEach){
 
-		async.each(_.keys(osm.ways), function(way_id, doneEach){
+		var osmway = osm.ways[way_id];
+		var way = new Way({
+			_id: way_id,
+			name: osmway.tags.name
+		});
 
-			var osmway = osm.ways[way_id];
-			var way = new Way({
-				_id: way_id,
-				name: osmway.tags.name
-			});
+		way.geometry = {type: 'LineString', coordinates: []};
 
-			way.geometry = {type: 'LineString', coordinates: []};
+		_.each(osmway.nodes, function(n){
+			var node = osm.nodes[n];
+			way.geometry.coordinates.push([node.lon, node.lat])
+		})
 
-			_.each(osmway.nodes, function(n){
-				var node = osm.nodes[n];
-				way.geometry.coordinates.push([node.lon, node.lat])
-			})
+		way.save(function(err){
+			if (err) return doneEach(err);
 
 			var fowardArc = new Arc({
-				way: way
+				_id: way._id + 'f',
+				way: way._id
 			});
 
 			var backwardArc = new Arc({
-				way: way,
+				_id: way._id + 'b',
+				way: way._id,
 				foward: false
 			});
 
-			async.series([way.save, fowardArc.save, backwardArc.save, doneEach]);
 
-		}, doneImportWays);
-	
-	})
+			fowardArc.save(doneEach);
+		})
+
+	}, doneImportWays);
 
 }
 
@@ -122,26 +124,18 @@ function importOsm(doneImport){
 
 	importWays(doneImport);
 
-// 	var way = osm.ways['293930072'];
-
-// //	var way = osm.ways[0];
-
-// 	way.geometry = {type: 'LineString', coordinates: []};
-
-// 	_.each(way.nodes, function(n){
-// 		var node = osm.nodes[n];
-// 		way.geometry.coordinates.push([node.lon, node.lat])
-// 	})
-
-// 	console.log(JSON.stringify(way.geometry.coordinates));
-
-// 	doneImport();
-
-	// Way.remove({}, function(err){
-
-	// })
 }
 
+
+function clearDb(doneClearDb) {
+	Way.remove(function(err){
+		if (err) return doneClearDb(err);
+		Arc.remove(function(err){
+			if (err) return doneClearDb(err);
+			doneClearDb();
+		})
+	})
+}
 
 
 mongoose.connection.on('open', function(){
@@ -150,8 +144,8 @@ mongoose.connection.on('open', function(){
 	Way = mongoose.model('Way');
 	Arc = mongoose.model('Arc');
 
-	importOsm(function(err){
+	async.series([clearDb, importOsm], function(err){
 		if (err) console.log(err);
 		mongoose.connection.close();	
-	})
+	});
 });
