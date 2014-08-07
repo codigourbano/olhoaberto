@@ -1,11 +1,28 @@
+/*
+ * Module dependencies
+ */
+
+var mongoose = require('mongoose'),
+    Schema = mongoose.Schema;
 
 /**
  * Route Schema
  */
 
 var RouteSchema = new Schema({
-  id: String,
+  _id: String,
   osm_relation: Number,
+	type: String,
+	name: String,
+	ref: String,
+	from: String,
+	to: String,
+	color: String,
+	colour: String,
+	network: String,
+	operator: String,
+	public_transport: String,
+	route: String,
   arcs: [{type: Schema.ObjectId, ref: 'Arc'}]
 })
 
@@ -32,3 +49,6 @@ var RouteSchema = new Schema({
 //     _.each()
 //   }
 // }
+
+
+mongoose.model('Route', RouteSchema)

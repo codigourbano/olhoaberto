@@ -2,16 +2,35 @@ var
 	mongoose = require('mongoose'),
 	fs = require('fs'),
 	_ = require('underscore'),
-	async = require('async');
+	async = require('async'),
+	SPTransAPI = require('sptrans.js');
+
+var sptrans = new SPTransAPI({
+  api_key: '7ec6172b29856483524db5f1ff99a051fc6ec7041954990ac61d25e56b720570'
+})
+
  
 require('./models/way');
 require('./models/arc');
-var Way, Arc;
+require('./models/route');
+var Way, Arc, Route;
  
  
 mongoose.connect('mongodb://localhost/olhoaberto')
 
 
+
+/*
+  Globals
+ */
+
+var osm = {
+	nodes: {},
+	ways: {},
+	relations: {}
+}
+
+var routes = {};
 
 /*
 	Overpass call
@@ -30,20 +49,8 @@ http://overpass-turbo.eu/s/4tD
   </union>
   <print/>
 </osm-script>
-
 */
 
-/*
-  get data
- */
-
-var _ = require('underscore');
-
-var osm = {
-	nodes: {},
-	ways: {},
-	relations: {}
-}
 
 
 var elements = require('./sptrans.json').elements;
@@ -117,13 +124,47 @@ function importWays(doneImportWays) {
 
 }
 
-function importRoutes(doneImportRoutes) {
+function importOSMRoutes(doneImportRoutes) {
+	async.each(_.keys(osm.relations), function(relation_id, doneEach){
+		var 
+			osmrelation = osm.relations[relation_id],
+			tags = osmrelation.tags;
+
+		if (tags['type'] == 'route') {
+			var route = new Route({
+				_id: relation_id,
+				osm_relation: relation_id,
+			});
+			
+			_.extend(route, tags);
+			route.save(doneEach);
+		} else doneEach();
+
+	}, doneImportRoutes);
 }
 
 function importOsm(doneImport){
 
-	importWays(doneImport);
+	importSPTransRoutes(doneImport);
 
+}
+
+function importSPTransRoutes(done){
+
+	sptrans.getAllRoutes(function(err, data){	
+		if (err) return done(err);
+		async.each(data, function(row, doneEach){
+			var route = new Route({
+				_id: row["CodigoLinha"],
+				circular: row["Circular"],
+				ref: row["Letreiro"],
+				from: row["Letreiro"] == "1" ? row["DenominacaoTPTS"] : row["DenominacaoTSTP"], 
+				to: row["Letreiro"] == "1" ? row["DenominacaoTSTP"] : row["DenominacaoTPTS"], 
+				type: row["Tipo"]
+			});
+			route.save(doneEach);
+		}, done);
+	});
 }
 
 
@@ -132,9 +173,12 @@ function clearDb(doneClearDb) {
 		if (err) return doneClearDb(err);
 		Arc.remove(function(err){
 			if (err) return doneClearDb(err);
-			doneClearDb();
-		})
-	})
+			Route.remove(function(err){
+				if (err) return doneClearDb(err);
+				doneClearDb();
+			});
+		});
+	});
 }
 
 
@@ -143,6 +187,7 @@ mongoose.connection.on('open', function(){
 
 	Way = mongoose.model('Way');
 	Arc = mongoose.model('Arc');
+	Route = mongoose.model('Route');
 
 	async.series([clearDb, importOsm], function(err){
 		if (err) console.log(err);
