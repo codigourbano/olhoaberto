@@ -6,10 +6,10 @@ This platform combines information from SPTrans and OpenStreetMap to provide bet
 
 Install dependencies:
 
-  npm install
+    npm install
 
 Start server:
 
-  npm start
+    npm start
 
-Visit: 'http://localhost:3000'.
+Visit: [http://localhost:3000](http://localhost:3000)
