@@ -1,0 +1,23 @@
+
+var 
+  path = require('path'),
+  rootPath = path.normalize(__dirname + '/..'),
+  SPTransAPIKey = 'GET YOURS at http://www.sptrans.com.br/desenvolvedores/';
+
+module.exports = {
+  development: {
+    db: 'mongodb://localhost/olhoaberto_dev',
+    root: rootPath,
+    SPTransAPIKey: SPTransAPIKey
+  },
+  test: {
+    db: 'mongodb://localhost/olhoaberto_test',
+    root: rootPath,
+    SPTransAPIKey: SPTransAPIKey
+  },
+  production: {
+    db: 'mongodb://localhost/olhoaberto_production',
+    root: rootPath,
+    SPTransAPIKey: SPTransAPIKey
+  }
+}

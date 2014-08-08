@@ -10,8 +10,9 @@ var mongoose = require('mongoose'),
  */
 
 var RouteSchema = new Schema({
-  _id: String,
-  osm_relation: Number,
+	_id: String,
+	osm_match: {type: Number, ref: 'Relation'},
+	osm_posible_matches: [{type: Number, ref: 'Relation'}],
 	type: String,
 	name: String,
 	ref: String,
@@ -23,32 +24,32 @@ var RouteSchema = new Schema({
 	operator: String,
 	public_transport: String,
 	route: String,
-  arcs: [{type: Schema.ObjectId, ref: 'Arc'}]
+	arcs: [{type: Schema.ObjectId, ref: 'Arc'}]
 })
 
 
-// RouteSchema.methods = {
-//   getNearestArcFromPoint: function(p){
-//     Way.where.findNearest(p,);
-//   },
-//   getAffectedArcsByVector: function(vector){
-//     var firstWay = getNearestWayFromPoint(vector.p0)
-//         lastWay = getNearestWayFromPoint(vector.p1);
+/**
+ * Statics
+ */
 
-//     // get firstWay index in route
+RouteSchema.statics = {
 
-//     // get lastWay index in route
+  load: function (id, cb) {
+    this.findOne({ _id : id })
+      .exec(cb)
+  },
 
-//     // using these indexes, extract all affected ways
+  list: function (options, cb) {
+    var criteria = options.criteria || {}
 
-//     // return ways
-//   },
-//   updateSpeedFromVector: function(vector) {
-//     vector.waysAffected = self.getAffectedWaysByVector(vector)
+    this.find(criteria)
+      .sort({'createdAt': -1}) // sort by date
+      .limit(options.perPage)
+      .skip(options.perPage * options.page)
+      .exec(cb)
+  }
 
-//     _.each()
-//   }
-// }
+}
 
 
 mongoose.model('Route', RouteSchema)
