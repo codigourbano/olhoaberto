@@ -16,7 +16,7 @@ exports.load = function(req, res, next, id){
 	Route.load(id, function (err, route) {
 		if (err) return next(err)
 		if (!route) return next(new Error('not found'))
-		req.route = route
+		req.routeDoc = route
 		next()
 	})
 }
@@ -51,4 +51,7 @@ exports.index = function(req, res){
  */
 
 exports.show = function(req, res){
+	res.render('routes/show', {
+		route: req.routeDoc
+	});
 }

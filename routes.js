@@ -26,9 +26,9 @@ module.exports = function (app, passport) {
   app.get('/sync/osm', sync.osm);  
 
   // route documents
-  app.param('id', routes.load)
+  app.param('routeId', routes.load)
   app.get('/routes', routes.index)
-  app.get('/routes/:id', routes.show)
+  app.get('/routes/:routeId', routes.show)
 
   // home route
   app.get('/', routes.index)

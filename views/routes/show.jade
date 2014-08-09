@@ -1,0 +1,14 @@
+extends ../layouts/default
+
+- console.log(route);
+
+block main
+
+
+  h1 #{route.ref} #{route.to}
+
+block content
+
+  button(class="btn btn-default", type="button") 
+    a(href='/routes') Todas as rotas
+    
