@@ -1,26 +1,41 @@
 extends ../layouts/default
 
 block main
-  h1= title
+	h1= title
 
 block content
 
-  h3.muted Sync to:
-  ul
-    li
-      a(href="/sync/sptrans") SPTrans
-    li
-      a(href="/sync/osm") OpenStreetMap
+	h3.muted Sync to:
+	ul
+		li
+			a(href="/sync/sptrans") SPTrans
+		li
+			a(href="/sync/osm") OpenStreetMap
 
-  - if (routes.length)
-    h3 Routes
-    - each route in routes
-        
-        p 
-          a(href='routes/#{route._id}') #{route.ref} - #{route.to}
-            
-          
+	- if (routes.length)
+		- if (pages > 1)
+					ul.pagination
+						!= createPagination(pages, page)
 
-  - else
-    h4.muted No routes.&nbsp;
-      a(href="/routes/new") create one        }
+		h3 Routes
+		table.table
+			thead
+				tr
+					th Número
+					th Destino
+					th No OSM?
+			tbody
+				- each route in routes
+					tr
+						td
+							p
+								a(href='routes/#{route._id}') #{route.ref}
+						td
+							p
+								a(href='routes/#{route._id}') #{route.to}
+						td
+							p 
+								x
+	- else
+		h4.muted No routes.&nbsp;
+			a(href="/routes/new") create one        }

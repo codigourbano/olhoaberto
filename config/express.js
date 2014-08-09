@@ -24,6 +24,8 @@ module.exports = function (app, config) {
 
   app.use(express.static(config.root + '/public'))
 
+  var helpers = require('view-helpers')
+  app.use(helpers('app name'))
 
   // set views path, template engine and default layout
   app.set('views', config.root + '/views')

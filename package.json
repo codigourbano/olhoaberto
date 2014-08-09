@@ -19,7 +19,9 @@
     "mongoose": "~3.8.14",
     "nodemon": "^1.2.1",
     "request": "latest",
-    "underscore": "~1.6.0"
+    "sptrans": "codigo-urbano/sptrans.js",
+    "underscore": "~1.6.0",
+    "view-helpers": "^0.1.5"
   },
   "repository": {
     "type": "git",
